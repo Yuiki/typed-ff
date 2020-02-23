@@ -73,8 +73,7 @@ export const onCreateUser = onCreate(posts("{userId}"), (doc, context) => {
 })
 ```
 
-### Task
+### Tasks
 
-- [x] Finish my changes
-- [ ] Push my commits to GitHub
-- [ ] Open a pull request
+- [ ] Add documents
+- [ ] Add tests
