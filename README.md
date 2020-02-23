@@ -5,7 +5,8 @@ Type-safe Firestore Triggers using [typesaurus](https://github.com/kossnocorp/ty
 ## Installation
 
 ```sh
-yarn add typed-ff
+# typed-ff depends on typesaurus
+yarn add typed-ff typesaurus
 ```
 
 ## Examples
