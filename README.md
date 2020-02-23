@@ -1,6 +1,6 @@
 # typed-ff
 
-Type-safe Firestore Triggers wrapper.
+Type-safe Firestore Triggers using [typesaurus](https://github.com/kossnocorp/typesaurus).
 
 ## Installation
 
