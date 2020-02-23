@@ -1,6 +1,6 @@
 {
   "name": "typed-ff",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Type-safe Firestore triggers",
   "main": "lib/index.js",
   "scripts": {
