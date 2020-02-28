@@ -25,19 +25,19 @@ const getPathAndCollection = <Model>(
 
 export const onCreate = <Model>(
   collectionOrRef: Collection<Model> | Ref<Model>,
-  handler: (doc: Doc<Model>, context: EventContext) => void
+  handler: (doc: Doc<Model>, context: EventContext) => any
 ): CloudFunction<DocumentSnapshot> => {
   const { path, collection } = getPathAndCollection(collectionOrRef)
 
   return firestore.document(path).onCreate((snap, ctx) => {
     const data = wrapData(snap.data()) as Model
-    handler(doc(ref(collection, snap.id), data), ctx)
+    return handler(doc(ref(collection, snap.id), data), ctx)
   })
 }
 
 export const onUpdate = <Model>(
   collectionOrRef: Collection<Model>,
-  handler: (change: Change<Doc<Model>>, context: EventContext) => void
+  handler: (change: Change<Doc<Model>>, context: EventContext) => any
 ): CloudFunction<Change<DocumentSnapshot>> => {
   const { path, collection } = getPathAndCollection(collectionOrRef)
 
@@ -48,25 +48,25 @@ export const onUpdate = <Model>(
       before: doc(ref(collection, before.id), beforeData),
       after: doc(ref(collection, after.id), afterData)
     }
-    handler(change, ctx)
+    return handler(change, ctx)
   })
 }
 
 export const onDelete = <Model>(
   collectionOrRef: Collection<Model>,
-  handler: (doc: Doc<Model>, context: EventContext) => void
+  handler: (doc: Doc<Model>, context: EventContext) => any
 ): CloudFunction<DocumentSnapshot> => {
   const { path, collection } = getPathAndCollection(collectionOrRef)
 
   return firestore.document(path).onDelete((snap, ctx) => {
     const data = wrapData(snap.data()) as Model
-    handler(doc(ref(collection, snap.id), data), ctx)
+    return handler(doc(ref(collection, snap.id), data), ctx)
   })
 }
 
 export const onWrite = <Model>(
   collectionOrRef: Collection<Model>,
-  handler: (change: Partial<Change<Doc<Model>>>, context: EventContext) => void
+  handler: (change: Partial<Change<Doc<Model>>>, context: EventContext) => any
 ): CloudFunction<Change<DocumentSnapshot>> => {
   const { path, collection } = getPathAndCollection(collectionOrRef)
 
@@ -77,6 +77,6 @@ export const onWrite = <Model>(
       before: beforeData && doc(ref(collection, before.id), beforeData),
       after: afterData && doc(ref(collection, after.id), afterData)
     }
-    handler(change, ctx)
+    return handler(change, ctx)
   })
 }
