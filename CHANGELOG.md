@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 - 2020-02-28
+
+Fix a bug that after data is before data
+
 ## 1.1.0 - 2020-02-28
 
 Fix a bug that functions return undefined

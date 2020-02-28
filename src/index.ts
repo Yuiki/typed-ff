@@ -43,7 +43,7 @@ export const onUpdate = <Model>(
 
   return firestore.document(path).onUpdate(({ before, after }, ctx) => {
     const beforeData = wrapData(before.data()) as Model
-    const afterData = wrapData(before.data()) as Model
+    const afterData = wrapData(after.data()) as Model
     const change = {
       before: doc(ref(collection, before.id), beforeData),
       after: doc(ref(collection, after.id), afterData)
@@ -72,7 +72,7 @@ export const onWrite = <Model>(
 
   return firestore.document(path).onWrite(({ before, after }, ctx) => {
     const beforeData = wrapData(before.data()) as Model | undefined
-    const afterData = wrapData(before.data()) as Model | undefined
+    const afterData = wrapData(after.data()) as Model | undefined
     const change = {
       before: beforeData && doc(ref(collection, before.id), beforeData),
       after: afterData && doc(ref(collection, after.id), afterData)
