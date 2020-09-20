@@ -2,11 +2,15 @@ import {
   firestore,
   EventContext,
   CloudFunction,
-  Change
+  Change,
 } from "firebase-functions"
 import { Collection, Doc, doc, ref, Ref } from "typesaurus"
 import { wrapData } from "typesaurus/data"
-import { DocumentSnapshot } from "firebase-functions/lib/providers/firestore"
+import {
+  DocumentSnapshot,
+  QueryDocumentSnapshot,
+} from "firebase-functions/lib/providers/firestore"
+import adaptor from "typesaurus/adaptor"
 
 const getPathAndCollection = <Model>(
   collectionOrRef: Collection<Model> | Ref<Model>
@@ -26,11 +30,12 @@ const getPathAndCollection = <Model>(
 export const onCreate = <Model>(
   collectionOrRef: Collection<Model> | Ref<Model>,
   handler: (doc: Doc<Model>, context: EventContext) => any
-): CloudFunction<DocumentSnapshot> => {
+): CloudFunction<QueryDocumentSnapshot> => {
   const { path, collection } = getPathAndCollection(collectionOrRef)
 
-  return firestore.document(path).onCreate((snap, ctx) => {
-    const data = wrapData(snap.data()) as Model
+  return firestore.document(path).onCreate(async (snap, ctx) => {
+    const a = await adaptor()
+    const data = wrapData(a, snap.data()) as Model
     return handler(doc(ref(collection, snap.id), data), ctx)
   })
 }
@@ -38,15 +43,16 @@ export const onCreate = <Model>(
 export const onUpdate = <Model>(
   collectionOrRef: Collection<Model>,
   handler: (change: Change<Doc<Model>>, context: EventContext) => any
-): CloudFunction<Change<DocumentSnapshot>> => {
+): CloudFunction<Change<QueryDocumentSnapshot>> => {
   const { path, collection } = getPathAndCollection(collectionOrRef)
 
-  return firestore.document(path).onUpdate(({ before, after }, ctx) => {
-    const beforeData = wrapData(before.data()) as Model
-    const afterData = wrapData(after.data()) as Model
+  return firestore.document(path).onUpdate(async ({ before, after }, ctx) => {
+    const a = await adaptor()
+    const beforeData = wrapData(a, before.data()) as Model
+    const afterData = wrapData(a, after.data()) as Model
     const change = {
       before: doc(ref(collection, before.id), beforeData),
-      after: doc(ref(collection, after.id), afterData)
+      after: doc(ref(collection, after.id), afterData),
     }
     return handler(change, ctx)
   })
@@ -55,11 +61,12 @@ export const onUpdate = <Model>(
 export const onDelete = <Model>(
   collectionOrRef: Collection<Model>,
   handler: (doc: Doc<Model>, context: EventContext) => any
-): CloudFunction<DocumentSnapshot> => {
+): CloudFunction<QueryDocumentSnapshot> => {
   const { path, collection } = getPathAndCollection(collectionOrRef)
 
-  return firestore.document(path).onDelete((snap, ctx) => {
-    const data = wrapData(snap.data()) as Model
+  return firestore.document(path).onDelete(async (snap, ctx) => {
+    const a = await adaptor()
+    const data = wrapData(a, snap.data()) as Model
     return handler(doc(ref(collection, snap.id), data), ctx)
   })
 }
@@ -70,12 +77,13 @@ export const onWrite = <Model>(
 ): CloudFunction<Change<DocumentSnapshot>> => {
   const { path, collection } = getPathAndCollection(collectionOrRef)
 
-  return firestore.document(path).onWrite(({ before, after }, ctx) => {
-    const beforeData = wrapData(before.data()) as Model | undefined
-    const afterData = wrapData(after.data()) as Model | undefined
+  return firestore.document(path).onWrite(async ({ before, after }, ctx) => {
+    const a = await adaptor()
+    const beforeData = wrapData(a, before.data()) as Model | undefined
+    const afterData = wrapData(a, after.data()) as Model | undefined
     const change = {
       before: beforeData && doc(ref(collection, before.id), beforeData),
-      after: afterData && doc(ref(collection, after.id), afterData)
+      after: afterData && doc(ref(collection, after.id), afterData),
     }
     return handler(change, ctx)
   })

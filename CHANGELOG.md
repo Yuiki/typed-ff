@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.1.1 - 2020-02-28
+## 1.2.1 - 2020-09-20
+
+Update dependencies
+
+## 1.2.0 - 2020-02-28
 
 Fix a bug that after data is before data
 
