@@ -36,7 +36,6 @@ export const onCreate = <Model>(
   return firestore.document(path).onCreate(async (snap, ctx) => {
     const a = await adaptor()
     const data = wrapData(a, snap.data()) as Model
-
     return handler(doc(pathToRef(snap.ref.path), data), ctx)
   })
 }
