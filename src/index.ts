@@ -4,7 +4,7 @@ import {
   CloudFunction,
   Change,
 } from "firebase-functions"
-import { Collection, Doc, doc, ref, Ref } from "typesaurus"
+import { Collection, Doc, doc, pathToRef, Ref } from "typesaurus"
 import { wrapData } from "typesaurus/data"
 import {
   DocumentSnapshot,
@@ -31,12 +31,13 @@ export const onCreate = <Model>(
   collectionOrRef: Collection<Model> | Ref<Model>,
   handler: (doc: Doc<Model>, context: EventContext) => any
 ): CloudFunction<QueryDocumentSnapshot> => {
-  const { path, collection } = getPathAndCollection(collectionOrRef)
+  const { path } = getPathAndCollection(collectionOrRef)
 
   return firestore.document(path).onCreate(async (snap, ctx) => {
     const a = await adaptor()
     const data = wrapData(a, snap.data()) as Model
-    return handler(doc(ref(collection, snap.id), data), ctx)
+
+    return handler(doc(pathToRef(snap.ref.path), data), ctx)
   })
 }
 
@@ -44,15 +45,15 @@ export const onUpdate = <Model>(
   collectionOrRef: Collection<Model>,
   handler: (change: Change<Doc<Model>>, context: EventContext) => any
 ): CloudFunction<Change<QueryDocumentSnapshot>> => {
-  const { path, collection } = getPathAndCollection(collectionOrRef)
+  const { path } = getPathAndCollection(collectionOrRef)
 
   return firestore.document(path).onUpdate(async ({ before, after }, ctx) => {
     const a = await adaptor()
     const beforeData = wrapData(a, before.data()) as Model
     const afterData = wrapData(a, after.data()) as Model
     const change = {
-      before: doc(ref(collection, before.id), beforeData),
-      after: doc(ref(collection, after.id), afterData),
+      before: doc(pathToRef<Model>(before.ref.path), beforeData),
+      after: doc(pathToRef<Model>(after.ref.path), afterData),
     }
     return handler(change, ctx)
   })
@@ -62,12 +63,12 @@ export const onDelete = <Model>(
   collectionOrRef: Collection<Model>,
   handler: (doc: Doc<Model>, context: EventContext) => any
 ): CloudFunction<QueryDocumentSnapshot> => {
-  const { path, collection } = getPathAndCollection(collectionOrRef)
+  const { path } = getPathAndCollection(collectionOrRef)
 
   return firestore.document(path).onDelete(async (snap, ctx) => {
     const a = await adaptor()
     const data = wrapData(a, snap.data()) as Model
-    return handler(doc(ref(collection, snap.id), data), ctx)
+    return handler(doc(pathToRef(snap.ref.path), data), ctx)
   })
 }
 
@@ -75,15 +76,16 @@ export const onWrite = <Model>(
   collectionOrRef: Collection<Model>,
   handler: (change: Partial<Change<Doc<Model>>>, context: EventContext) => any
 ): CloudFunction<Change<DocumentSnapshot>> => {
-  const { path, collection } = getPathAndCollection(collectionOrRef)
+  const { path } = getPathAndCollection(collectionOrRef)
 
   return firestore.document(path).onWrite(async ({ before, after }, ctx) => {
     const a = await adaptor()
     const beforeData = wrapData(a, before.data()) as Model | undefined
     const afterData = wrapData(a, after.data()) as Model | undefined
+
     const change = {
-      before: beforeData && doc(ref(collection, before.id), beforeData),
-      after: afterData && doc(ref(collection, after.id), afterData),
+      before: beforeData && doc(pathToRef<Model>(before.ref.path), beforeData),
+      after: afterData && doc(pathToRef<Model>(after.ref.path), afterData),
     }
     return handler(change, ctx)
   })
