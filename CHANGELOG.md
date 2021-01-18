@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2 - 2021-01-18
+
+- #6 Fix ref path is not correct in document snapshot ( Thanks to @AlexanderArvidsson )
+- Update dependencies
+
 ## 1.2.1 - 2020-09-20
 
 Update dependencies
